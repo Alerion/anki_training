@@ -75,6 +75,7 @@ def main():
         if event == Event.INCORRECT:
             incorrect += 1
 
+        i += 1
         word = random.choice(words)
         field_name, field_value = get_random_field(word)
         typer.secho(f"{i}: {field_value}", fg=typer.colors.GREEN)
