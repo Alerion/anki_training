@@ -1,6 +1,5 @@
 from anki.db import DB
 from anki.collection import Collection
-from rich import print as rprint
 from dataclasses import dataclass
 from bs4 import BeautifulSoup
 import re
@@ -10,99 +9,23 @@ import keyboard
 from enum import Enum
 from rich.console import Console
 from rich.text import Text
+from rich import print as rprint
 
-from anki_training.get_words import get_words_from_collection
-from anki_training.datatypes import WordInfo
+from anki_training.get_irregular_verbs_words import (
+    get_irregular_verbs_from_collection, get_irregular_verbs_cards, get_verb_cards_from_words
+)
+from anki_training.datatypes import AuxiliaryVerb
+from anki_training.get_verbs_words import get_verbs_with_sein, get_verbs_with_haben
+from anki_training.irregular_verbs_command import irregular_verbs_command
+from anki_training.sein_oder_haben_command import sein_oder_haben_command
 
+app = typer.Typer()
 
-class Event(Enum):
-    CORRECT = 1
-    INCORRECT = 2
-    SHOW_ANSWER = 3
-    EXIT = 4
-
-
-
-VERBOSE_FIELD_NAME = {
-    "simple_past": "past",
-    "past_participle": "perfect",
-    "present": "present",
-}
-
-
-def main():
-    words = get_words_from_collection()
-    rprint(f"Found {len(words)} words.")
-    rprint("ESC to exit.")
-    rprint("SPACE to show answer.")
-    rprint("1 if you knew answer.")
-    rprint("2 if you did not know answer.\n")
-    i = 1
-    correct = 0
-    incorrect = 0
-    is_waiting_result_validation = False
-
-    word = random.choice(words)
-    field_name, field_value = get_random_field(word)
-    typer.secho(f"{i}: {field_value}", fg=typer.colors.GREEN)
-
-    while True:
-        event = wait_for_event()
-
-        if event == Event.EXIT:
-            total = correct + incorrect
-            if total:
-                rprint(f"CORRECT: {correct}, {correct / total:.1%}")
-                rprint(f"INCORRECT: {incorrect}, {incorrect / total:.1%}")
-            raise typer.Exit()
-
-        if event == Event.SHOW_ANSWER:
-            console = Console()
-            styled_text = Text()
-            styled_text.append(word.translation, style="bold orange4")
-            styled_text.append("    ", style="default")
-            styled_text.append(VERBOSE_FIELD_NAME[field_name], style="bold blue")
-            console.print(styled_text)
-            rprint("Press 1 if correct, otherwise 2...\n")
-            is_waiting_result_validation = True
-            continue
-
-        if not is_waiting_result_validation:
-            continue
-
-        if event == Event.CORRECT:
-            correct += 1
-        if event == Event.INCORRECT:
-            incorrect += 1
-
-        i += 1
-        word = random.choice(words)
-        field_name, field_value = get_random_field(word)
-        typer.secho(f"{i}: {field_value}", fg=typer.colors.GREEN)
-        is_waiting_result_validation = False
-
-
-def wait_for_event() -> Event:
-    while True:
-        keyboard_event = keyboard.read_event(suppress=True)
-        if keyboard_event.event_type != keyboard.KEY_DOWN:
-            continue
-
-        if keyboard_event.name == "esc":
-            return Event.EXIT
-        if keyboard_event.name == "1":
-            return Event.CORRECT
-        if keyboard_event.name == "2":
-            return Event.INCORRECT
-        if keyboard_event.name == "space":
-            return Event.SHOW_ANSWER
-
-
-def get_random_field(word: WordInfo):
-    fields = ['simple_past', 'past_participle', 'present']
-    field_name = random.choice(fields)
-    return field_name, getattr(word, field_name)
+# python -m main irregular_verbs
+app.command("irregular_verbs")(irregular_verbs_command)
+# python -m main sein_oder_haben
+app.command("sein_oder_haben")(sein_oder_haben_command)
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()

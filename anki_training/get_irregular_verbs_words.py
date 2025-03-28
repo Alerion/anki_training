@@ -1,24 +1,39 @@
-from anki.collection import Collection
 from rich import print as rprint
 from bs4 import BeautifulSoup
 import re
+import random
 
-from .datatypes import WordInfo
+from .datatypes import WordInfo, IrregularVerbCard, VerbCard, AuxiliaryVerb
+from .anki_utils import get_notes_from_deck
 
-COLLECTION_PATH = "c:/Users/user/AppData/Roaming/Anki2/User 1/collection.anki2"
 DECK_NAME = "Deutsch::07 Irregular Verbs"
 
+VERBOSE_FIELD_NAME = {
+    "simple_past": "past",
+    "past_participle": "perfect",
+    "present": "present",
+}
 
-def get_words_from_collection():
-    collection = Collection(COLLECTION_PATH)
-    deck = collection.decks.by_name(DECK_NAME)
-    deck_id = deck['id']
-    card_ids = collection.decks.cids(deck_id)
+
+def get_irregular_verbs_cards(words: list[WordInfo]) -> list[IrregularVerbCard]:
+    word_cards = []
+
+    for word in words:
+        for field, verbose_name in VERBOSE_FIELD_NAME.items():
+            word_cards.append(IrregularVerbCard(
+                translation=word.translation,
+                word=getattr(word, field),
+                time=verbose_name,
+            ))
+    random.shuffle(word_cards)
+    return word_cards
+
+
+def get_irregular_verbs_from_collection() -> list[WordInfo]:
+    notes = get_notes_from_deck(DECK_NAME)
 
     words = []
-    for card_id in card_ids:
-        card = collection.get_card(card_id)
-        note = card.note()
+    for note in notes:
         try:
             words.append(parse_note_back_field(note["Back"]))
         except Exception:
@@ -26,7 +41,6 @@ def get_words_from_collection():
             raise
 
     return words
-
 
 
 def parse_note_back_field(html_content) -> WordInfo:
@@ -51,3 +65,13 @@ def parse_note_back_field(html_content) -> WordInfo:
     word_info.present = present_value_span.get_text().strip()
 
     return word_info
+
+
+def get_verb_cards_from_words(words: list[WordInfo], auxiliary_verb: AuxiliaryVerb) -> list[VerbCard]:
+    cards = []
+    for word in words:
+        cards.append(VerbCard(
+            word=word,
+            auxiliary_verb=auxiliary_verb,
+        ))
+    return cards
