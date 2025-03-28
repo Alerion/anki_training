@@ -1,4 +1,5 @@
 from anki.collection import Collection, Note
+
 from .config import COLLECTION_PATH
 
 
@@ -8,7 +9,7 @@ def get_notes_from_deck(
 ) -> list[Note]:
     collection = Collection(collection_path)
     deck = collection.decks.by_name(deck_name)
-    deck_id = deck['id']
+    deck_id = deck["id"]
     card_ids = collection.decks.cids(deck_id)
 
     notes = []

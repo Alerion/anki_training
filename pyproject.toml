@@ -11,3 +11,22 @@ dependencies = [
     "rich~=13.6",
     "typer~=0.15",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.2",
+]
+
+
+[tool.ruff]
+line-length = 100
+extend-exclude = []
+
+[tool.ruff.lint]
+# Add the `line-too-long` rule to the enforced rule set. By default, Ruff omits rules that
+# overlap with the use of a formatter, like Black, but we can override this behavior by
+# explicitly adding the rule.
+extend-select = ["E501", "RUF100", "I"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120

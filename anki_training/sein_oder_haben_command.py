@@ -1,23 +1,17 @@
-from anki.db import DB
-from anki.collection import Collection
-from dataclasses import dataclass
-from bs4 import BeautifulSoup
-import re
-import typer
 import random
-import keyboard
 from enum import Enum
+
+import keyboard
+import typer
+from rich import print as rprint
 from rich.console import Console
 from rich.text import Text
-from rich import print as rprint
 
-
-from anki_training.get_irregular_verbs_words import (
-    get_irregular_verbs_from_collection, get_irregular_verbs_cards, get_verb_cards_from_words
-)
 from anki_training.datatypes import AuxiliaryVerb
-from anki_training.get_verbs_words import get_verbs_with_sein, get_verbs_with_haben
-from anki_training.irregular_verbs_command import irregular_verbs_command
+from anki_training.get_irregular_verbs_words import (
+    get_verb_cards_from_words,
+)
+from anki_training.get_verbs_words import get_verbs_with_haben, get_verbs_with_sein
 
 
 class Event(Enum):
@@ -40,7 +34,7 @@ def sein_oder_haben_command() -> None:
     rprint("Q if auxiliary verb is haben.\n")
 
     random.shuffle(verbs_with_haben)
-    verbs_with_haben = verbs_with_haben[:len(verbs_with_sein)]
+    verbs_with_haben = verbs_with_haben[: len(verbs_with_sein)]
 
     cards = get_verb_cards_from_words(verbs_with_haben, AuxiliaryVerb.haben)
     cards += get_verb_cards_from_words(verbs_with_haben, AuxiliaryVerb.sein)
@@ -67,9 +61,9 @@ def sein_oder_haben_command() -> None:
             finish()
 
         if event == Event.SEIN:
-            is_correct = (card.auxiliary_verb == AuxiliaryVerb.sein)
+            is_correct = card.auxiliary_verb == AuxiliaryVerb.sein
         elif event == Event.HABEN:
-            is_correct = (card.auxiliary_verb == AuxiliaryVerb.haben)
+            is_correct = card.auxiliary_verb == AuxiliaryVerb.haben
         elif event == Event.SKIP:
             is_correct = False
         else:

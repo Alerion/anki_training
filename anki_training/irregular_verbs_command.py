@@ -1,21 +1,15 @@
-from anki.db import DB
-from anki.collection import Collection
-from dataclasses import dataclass
-from bs4 import BeautifulSoup
-import re
-import typer
-import random
-import keyboard
 from enum import Enum
+
+import keyboard
+import typer
+from rich import print as rprint
 from rich.console import Console
 from rich.text import Text
-from rich import print as rprint
 
 from anki_training.get_irregular_verbs_words import (
-    get_irregular_verbs_from_collection, get_irregular_verbs_cards, get_verb_cards_from_words
+    get_irregular_verbs_cards,
+    get_irregular_verbs_from_collection,
 )
-from anki_training.datatypes import AuxiliaryVerb
-from anki_training.get_verbs_words import get_verbs_with_sein, get_verbs_with_haben
 
 
 class Event(Enum):
