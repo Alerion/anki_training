@@ -37,7 +37,7 @@ def sein_oder_haben_command() -> None:
     verbs_with_haben = verbs_with_haben[: len(verbs_with_sein)]
 
     cards = get_verb_cards_from_words(verbs_with_haben, AuxiliaryVerb.haben)
-    cards += get_verb_cards_from_words(verbs_with_haben, AuxiliaryVerb.sein)
+    cards += get_verb_cards_from_words(verbs_with_sein, AuxiliaryVerb.sein)
     random.shuffle(cards)
 
     i = 1

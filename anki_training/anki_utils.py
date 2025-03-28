@@ -12,9 +12,12 @@ def get_notes_from_deck(
     deck_id = deck["id"]
     card_ids = collection.decks.cids(deck_id)
 
+    note_ids = set()
     notes = []
     for card_id in card_ids:
         card = collection.get_card(card_id)
-        notes.append(card.note())
+        if card.nid not in note_ids:
+            notes.append(card.note())
+            note_ids.add(card.nid)
 
     return notes
