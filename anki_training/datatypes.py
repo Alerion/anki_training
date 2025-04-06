@@ -3,8 +3,8 @@ from enum import Enum
 
 
 class AuxiliaryVerb(str, Enum):
-    sein = "sein"
-    haben = "haben"
+    bin = "bin"
+    habe = "habe"
 
 
 @dataclass

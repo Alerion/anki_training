@@ -30,14 +30,14 @@ def sein_oder_haben_command() -> None:
     rprint(f"Found {len(verbs_with_haben)} verbs with haben.")
     rprint("ESC to exit.")
     rprint("SPACE to skip word.")
-    rprint("W if auxiliary verb is sein.")
-    rprint("Q if auxiliary verb is haben.\n")
+    rprint("R if auxiliary verb is bin.")
+    rprint("Q if auxiliary verb is habe.\n")
 
     random.shuffle(verbs_with_haben)
     verbs_with_haben = verbs_with_haben[: len(verbs_with_sein)]
 
-    cards = get_verb_cards_from_words(verbs_with_haben, AuxiliaryVerb.haben)
-    cards += get_verb_cards_from_words(verbs_with_sein, AuxiliaryVerb.sein)
+    cards = get_verb_cards_from_words(verbs_with_haben, AuxiliaryVerb.habe)
+    cards += get_verb_cards_from_words(verbs_with_sein, AuxiliaryVerb.bin)
     random.shuffle(cards)
 
     i = 1
@@ -61,9 +61,9 @@ def sein_oder_haben_command() -> None:
             finish()
 
         if event == Event.SEIN:
-            is_correct = card.auxiliary_verb == AuxiliaryVerb.sein
+            is_correct = card.auxiliary_verb == AuxiliaryVerb.bin
         elif event == Event.HABEN:
-            is_correct = card.auxiliary_verb == AuxiliaryVerb.haben
+            is_correct = card.auxiliary_verb == AuxiliaryVerb.habe
         elif event == Event.SKIP:
             is_correct = False
         else:
@@ -103,7 +103,7 @@ def wait_for_event() -> Event:
 
         if keyboard_event.name == "esc":
             return Event.EXIT
-        if keyboard_event.name == "w":
+        if keyboard_event.name == "r":
             return Event.SEIN
         if keyboard_event.name == "q":
             return Event.HABEN

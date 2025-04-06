@@ -25,8 +25,8 @@ def irregular_verbs_command():
     rprint(f"Found {len(words)} words.")
     rprint("ESC to exit.")
     rprint("SPACE to show answer.")
-    rprint("1 if you knew answer.")
-    rprint("2 if you did not know answer.\n")
+    rprint("4 if you knew answer.")
+    rprint("1 if you did not know answer.\n")
     i = 1
     correct = 0
     incorrect = 0
@@ -54,8 +54,8 @@ def irregular_verbs_command():
             styled_text.append(word_card.translation, style="bold orange4")
             styled_text.append("    ", style="default")
             styled_text.append(word_card.time, style="bold blue")
+            styled_text.append("\n", style="default")
             console.print(styled_text)
-            rprint("Press 1 if correct, otherwise 2...\n")
             is_waiting_result_validation = True
             continue
 
@@ -84,9 +84,9 @@ def wait_for_event() -> Event:
 
         if keyboard_event.name == "esc":
             return Event.EXIT
-        if keyboard_event.name == "1":
+        if keyboard_event.name == "4":
             return Event.CORRECT
-        if keyboard_event.name == "2":
+        if keyboard_event.name == "1":
             return Event.INCORRECT
         if keyboard_event.name == "space":
             return Event.SHOW_ANSWER
