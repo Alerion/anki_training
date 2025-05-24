@@ -8,6 +8,8 @@ dependencies = [
     "anki~=25.2",
     "beautifulsoup4~=4.13",
     "keyboard~=0.13",
+    "openai~=1.82.0",
+    "pydantic-settings~=2.9.0",
     "rich~=13.6",
     "typer~=0.15",
 ]

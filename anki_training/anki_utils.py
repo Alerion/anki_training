@@ -1,11 +1,11 @@
 from anki.collection import Collection, Note
 
-from .config import COLLECTION_PATH
+from .config import settings
 
 
 def get_notes_from_deck(
     deck_name: str,
-    collection_path: str = COLLECTION_PATH,
+    collection_path: str = settings.COLLECTION_PATH,
 ) -> list[Note]:
     collection = Collection(collection_path)
     deck = collection.decks.by_name(deck_name)
