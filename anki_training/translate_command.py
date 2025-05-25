@@ -1,7 +1,5 @@
-from dataclasses import dataclass
 from enum import Enum
 
-import keyboard
 import typer
 from openai import OpenAI
 from openai.types.responses import Response
