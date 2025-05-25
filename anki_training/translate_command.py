@@ -1,15 +1,33 @@
+import random
 from enum import Enum
 
-import typer
 from openai import OpenAI
 from openai.types.responses import Response
 from rich import print as rprint
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.prompt import Prompt
+from rich.text import Text
 
 from anki_training.config import settings
 
 openai = OpenAI(api_key=settings.OPEN_AI_API_KEY)
+
+MESSAGE_STYLE = "bold green"
+RESPONSE_STYLE = "bold orange4"
+
+
+class DeutschLevel(str, Enum):
+    B1 = "B1"
+    B2 = "B2"
+    # C1 = "C1"
+
+
+class DeutschTime(str, Enum):
+    Präsens = "Präsens"
+    Perfekt = "Perfekt"
+    Präteritum = "Präteritum"
+    Futur1 = "Futur I"
 
 
 class State(Enum):
@@ -20,8 +38,7 @@ class State(Enum):
 
 def translate_command():
     # python -m main translate
-    rprint("Ти викладач німецької мови.")
-    rprint("Дай одне речення українською на рівні B1-B2 для перекладу на німецьку.\n")
+    print_message("Дай одне речення українською для перекладу на німецьку.\n")
 
     state = State.START
     exercise = Exercise()
@@ -34,7 +51,7 @@ def translate_command():
             continue
 
         if state is State.WAITING_FOR_TRANSLATION:
-            translation = typer.prompt("Переклад").strip()
+            translation = Prompt.ask(Text("Мій переклад", MESSAGE_STYLE)).strip()
             rprint("")
             response = exercise.check_translation(translation)
             print_response(response)
@@ -42,7 +59,9 @@ def translate_command():
             continue
 
         if state is State.WAITING_FOR_QUESTION:
-            message = typer.prompt("Маєш питання чи введи + для наступного речення").strip()
+            message = Prompt.ask(
+                Text("Маєш питання чи введи + для наступного речення?", RESPONSE_STYLE)
+            ).strip()
             rprint("")
             if message == "+":
                 exercise = Exercise()
@@ -66,10 +85,20 @@ class Exercise:
         return self._last_response.id
 
     def get_sentence(self) -> Response:
+        deutsch_level = get_random_deutsch_level()
+        deutsch_time = get_random_deutsch_time()
+        print(deutsch_level, deutsch_time)
         response = openai.responses.create(
-            model="gpt-4.1-mini",
+            model="gpt-4.1",
             instructions="Ти викладач німецької мови.",
-            input="Дай одне речення українською на рівні B1-B2 для перекладу на німецьку.",
+            input=f"""
+Дай одне речення українською на рівні {deutsch_level} для перекладу на німецьку.
+Це речення має бути німецькою буде в {deutsch_time}.
+Також можеш використовути Adjektive, щоб я тренував Deklination.
+Також Präpositionen, щоб я вчив відмінювання слів з ними.
+Це все не обов'язково додавати в одне речення. Обери щось випадково.
+Поверни лише речення, не потрібно додаткових коментарів.
+""",
         )
         self._last_response = response
         return response
@@ -77,7 +106,7 @@ class Exercise:
     def check_translation(self, translation: str) -> Response:
         response = openai.responses.create(
             model="gpt-4.1-mini",
-            input=f'Мій переклад: "{translation}" Виправ помилки та поясни ці помилки, чому правильно інакше.'
+            input=f'Мій переклад: "{translation}" Виправ помилки та поясни чому ти виправив.'
             f" Якщо немає помилок, то не потрібно додаткових пояснень.",
             previous_response_id=self.previous_response_id,
         )
@@ -94,8 +123,22 @@ class Exercise:
         return response
 
 
+def print_message(message: str) -> None:
+    console = Console()
+    styled_text = Text(message, MESSAGE_STYLE)
+    console.print(styled_text)
+
+
 def print_response(response: Response) -> None:
     console = Console()
-    md = Markdown(response.output[0].content[0].text)
+    md = Markdown(response.output[0].content[0].text, style=RESPONSE_STYLE)
     console.print(md)
     console.print("")
+
+
+def get_random_deutsch_level() -> DeutschLevel:
+    return random.choice(list(DeutschLevel))
+
+
+def get_random_deutsch_time() -> DeutschTime:
+    return random.choice(list(DeutschTime))
