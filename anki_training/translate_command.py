@@ -42,11 +42,13 @@ def translate_command():
 
     state = State.START
     exercise = Exercise()
+    counter = 0
 
     while True:
         if state is State.START:
+            counter += 1
             response = exercise.get_sentence()
-            print_response(response)
+            print_sentence(counter, response)
             state = State.WAITING_FOR_TRANSLATION
             continue
 
@@ -87,7 +89,7 @@ class Exercise:
     def get_sentence(self) -> Response:
         deutsch_level = get_random_deutsch_level()
         deutsch_time = get_random_deutsch_time()
-        print(deutsch_level, deutsch_time)
+        print_bot_message(f"Рівень: {deutsch_level.value}. Час: {deutsch_time.value}")
         response = openai.responses.create(
             model="gpt-4.1",
             instructions="Ти викладач німецької мови.",
@@ -107,6 +109,7 @@ class Exercise:
         response = openai.responses.create(
             model="gpt-4.1-mini",
             input=f'Мій переклад: "{translation}" Виправ помилки та поясни чому ти виправив.'
+            f" Якщо є помилки, то відили *курсивом* в markdown те, що ти виправив."
             f" Якщо немає помилок, то не потрібно додаткових пояснень.",
             previous_response_id=self.previous_response_id,
         )
@@ -125,8 +128,16 @@ class Exercise:
 
 def print_message(message: str) -> None:
     console = Console()
-    styled_text = Text(message, MESSAGE_STYLE)
+    styled_text = Markdown(message, MESSAGE_STYLE)
     console.print(styled_text)
+
+
+def print_sentence(number: int, response: Response) -> None:
+    console = Console()
+    sentence = response.output[0].content[0].text
+    md = Markdown(f"({number}) {sentence}", style=RESPONSE_STYLE)
+    console.print(md)
+    console.print("")
 
 
 def print_response(response: Response) -> None:
@@ -134,6 +145,12 @@ def print_response(response: Response) -> None:
     md = Markdown(response.output[0].content[0].text, style=RESPONSE_STYLE)
     console.print(md)
     console.print("")
+
+
+def print_bot_message(message: str) -> None:
+    console = Console()
+    styled_text = Markdown(message, RESPONSE_STYLE)
+    console.print(styled_text)
 
 
 def get_random_deutsch_level() -> DeutschLevel:
