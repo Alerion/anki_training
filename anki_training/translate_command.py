@@ -110,7 +110,8 @@ class Exercise:
             model="gpt-4.1-mini",
             input=f'Мій переклад: "{translation}" Виправ помилки та поясни чому ти виправив.'
             f" Якщо є помилки, то відили *курсивом* в markdown те, що ти виправив."
-            f" Якщо немає помилок, то не потрібно додаткових пояснень.",
+            f" Якщо немає помилок, то не потрібно додаткових пояснень."
+            f" Назви відмінків пиши англійською: Nominative, Accusative, Dative, Genitive.",
             previous_response_id=self.previous_response_id,
         )
         self._last_response = response
